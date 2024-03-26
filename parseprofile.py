@@ -61,7 +61,7 @@ def populate_table(directory, steamId):
         opening_stats = json.load(open_file)
         open_file.close()
         
-        player, index = find_player_by_steamId(stats["playerStats"], steamId)
+        player = find_player_by_steamId(stats["playerStats"], steamId)
         
         game_info.append(stats["id"])
         game_info.append(steamId)
