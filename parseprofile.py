@@ -61,19 +61,23 @@ def populate_table(directory, steamId):
         opening_stats = json.load(open_file)
         open_file.close()
         
+        invalid = False
         player = find_player_by_steamId(stats["playerStats"], steamId)
         
         game_info.append(stats["id"])
         game_info.append(steamId)
         game_info.append(0)
         
-        roundsWon = player["tRoundsWon"] + player["ctRoundsWon"]
-        roundsLost = player["tRoundsLost"] + player["ctRoundsLost"]
+        if player["tRoundsWon"] and player["ctRoundsWon"] and player["tRoundsLost"] and player["ctRoundsLost"]:
+            roundsWon = player["tRoundsWon"] + player["ctRoundsWon"]
+            roundsLost = player["tRoundsLost"] + player["ctRoundsLost"]
         
-        if roundsLost > roundsWon:
-            game_info.append(0)
+            if roundsLost > roundsWon:
+                game_info.append(0)
+            else:
+                game_info.append(1)
         else:
-            game_info.append(1)
+            invalid = True
         
         game_info.append(stats["teamScores"][0])
         game_info.append(stats["teamScores"][1])
@@ -161,7 +165,8 @@ def populate_table(directory, steamId):
         
         info = tuple(game_info)
         info = tuple(0 if value is None else value for value in info)
-        player_info.append(info)
+        if invalid == False:
+            player_info.append(info)
      
     return player_info
     
@@ -175,7 +180,7 @@ def main(player_url):
         for i in player_profile_info["games"]:
             get_game_data(i["gameId"], directory)
          
-        data = populate_table(directory, steamId) 
+        data = populate_table(directory, steamId)
         
         database_path = directory + "/" + steamId+"_info.db"
         
