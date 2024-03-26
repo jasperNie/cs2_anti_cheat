@@ -67,16 +67,13 @@ def populate_table(directory, steamId):
         game_info.append(steamId)
         game_info.append(0)
         
-        if stats["teamScores"][0] > stats["teamScores"][1]:
-            if index < 5:
-                game_info.append(1)
-            else:
-                game_info.append(0)
+        roundsWon = player["tRoundsWon"] + player["ctRoundsWon"]
+        roundsLost = player["tRoundsLost"] + player["ctRoundsLost"]
+        
+        if roundsLost > roundsWon:
+            game_info.append(1)
         else:
-            if index < 5:
-                game_info.append(0)
-            else:
-                game_info.append(1)   
+            game_info.append(0)
         
         game_info.append(stats["teamScores"][0])
         game_info.append(stats["teamScores"][1])
