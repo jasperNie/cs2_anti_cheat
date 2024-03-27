@@ -41,7 +41,7 @@ def find_player_by_steamId(player_stats_list, steamId):
     index = 0
     for player in player_stats_list:
         if player.get("steam64Id") == steamId:
-            return player, index
+            return player
         index += 1
     return None
 
@@ -64,11 +64,26 @@ def populate_table(directory, steamId):
         invalid = False
         player = find_player_by_steamId(stats["playerStats"], steamId)
         
-        game_info.append(stats["id"])
+        if "id" in list(stats.keys()):
+            game_info.append(stats["id"])
+        else: 
+            invalid = True
+        
+        if stats["teamScores"] is not None:
+            if len(stats["teamScores"]) == 0:
+                invalid = True
+        else:
+            invalid = True
+        
         game_info.append(steamId)
         game_info.append(0)
         
-        if player["tRoundsWon"] and player["ctRoundsWon"] and player["tRoundsLost"] and player["ctRoundsLost"]:
+        with open('variables.json', 'r') as json_file:
+            variables = json.load(json_file)
+            
+        noMissingVariables = all(variable in player for variable in variables)
+        
+        if noMissingVariables and player["tRoundsWon"] is not None and player["ctRoundsWon"] is not None and player["tRoundsLost"] is not None and player["ctRoundsLost"] is not None and invalid is not True:
             roundsWon = player["tRoundsWon"] + player["ctRoundsWon"]
             roundsLost = player["tRoundsLost"] + player["ctRoundsLost"]
         
@@ -76,95 +91,95 @@ def populate_table(directory, steamId):
                 game_info.append(0)
             else:
                 game_info.append(1)
+                
+            game_info.append(stats["teamScores"][0])
+            game_info.append(stats["teamScores"][1])
+            if stats["details"]:
+                game_info.append(stats["details"]["mpMaxrounds"])
+            else:
+                game_info.append(30)
+            
+            game_info.append(player["preaim"])
+            game_info.append(player["reactionTime"])
+            game_info.append(player["accuracy"])
+            game_info.append(player["accuracyEnemySpotted"])
+            game_info.append(player["accuracyHead"])
+            game_info.append(player["shotsFiredEnemySpotted"])
+            game_info.append(player["shotsFired"])
+            game_info.append(player["shotsHitEnemySpotted"])
+            game_info.append(player["shotsHitFriend"])
+            game_info.append(player["shotsHitFriendHead"])
+            game_info.append(player["shotsHitFoe"])
+            game_info.append(player["shotsHitFoeHead"])
+            game_info.append(player["utilityOnDeathAvg"])
+            game_info.append(player["heFoesDamageAvg"])
+            game_info.append(player["heFriendsDamageAvg"])
+            game_info.append(player["heThrown"])
+            game_info.append(player["molotovThrown"])
+            game_info.append(player["smokeThrown"])
+            game_info.append(player["smokeThrownCT"])
+            game_info.append(player["smokeThrownCTGood"])
+            game_info.append(player["smokeThrownCTGoodRatio"])
+            game_info.append(player["smokeThrownCTFoes"])
+            game_info.append(player["counterStrafingShotsAll"])
+            game_info.append(player["counterStrafingShotsBad"])
+            game_info.append(player["counterStrafingShotsGood"])
+            game_info.append(player["counterStrafingShotsGoodRatio"])
+            game_info.append(player["flashbangHitFoe"])
+            game_info.append(player["flashbangLeadingToKill"])
+            game_info.append(player["flashbangHitFoeAvgDuration"])
+            game_info.append(player["flashbangHitFriend"])
+            game_info.append(player["flashbangThrown"])
+            game_info.append(player["flashAssist"])
+            game_info.append(player["score"])
+            game_info.append(player["initialTeamNumber"])
+            game_info.append(player["mvps"])
+            game_info.append(player["ctRoundsWon"])
+            game_info.append(player["ctRoundsLost"])
+            game_info.append(player["tRoundsWon"])
+            game_info.append(player["tRoundsLost"])
+            game_info.append(player["sprayAccuracy"])
+            game_info.append(player["totalKills"])
+            game_info.append(player["totalDeaths"])
+            game_info.append(player["kdRatio"])
+            game_info.append(player["multi2k"])
+            game_info.append(player["multi3k"])
+            game_info.append(player["multi4k"])
+            game_info.append(player["multi5k"])
+            game_info.append(player["hltvRating"])
+            game_info.append(player["hsp"])
+            game_info.append(player["roundsSurvived"])
+            game_info.append(player["roundsSurvivedPercentage"])
+            game_info.append(player["dpr"])
+            game_info.append(player["totalAssists"])
+            game_info.append(player["totalDamage"])
+            game_info.append(player["tradeKillOpportunities"])
+            game_info.append(player["tradeKillAttempts"])
+            game_info.append(player["tradeKillsSucceeded"])
+            game_info.append(player["tradeKillAttemptsPercentage"])
+            game_info.append(player["tradeKillsSuccessPercentage"])
+            game_info.append(player["tradeKillOpportunitiesPerRound"])
+            game_info.append(player["tradedDeathOpportunities"])
+            game_info.append(player["tradedDeathAttempts"])
+            game_info.append(player["tradedDeathAttemptsPercentage"])
+            game_info.append(player["tradedDeathsSucceeded"])
+            game_info.append(player["tradedDeathsSuccessPercentage"])
+            game_info.append(player["tradedDeathsOpportunitiesPerRound"])
+            game_info.append(player["leetifyRating"])
+            game_info.append(player["personalPerformanceRating"])
+            game_info.append(player["ctLeetifyRating"])
+            game_info.append(player["tLeetifyRating"])
+            
+            counter = 0
+            for i in opening_stats:
+                if i["attackerSteam64Id"] == steamId:
+                    counter += 1
+            game_info.append(counter)
+            
+            info = tuple(game_info)
+            info = tuple(0 if value is None else value for value in info)
         else:
             invalid = True
-        
-        game_info.append(stats["teamScores"][0])
-        game_info.append(stats["teamScores"][1])
-        if stats["details"]:
-            game_info.append(stats["details"]["mpMaxrounds"])
-        else:
-            game_info.append(30)
-        
-        game_info.append(player["preaim"])
-        game_info.append(player["reactionTime"])
-        game_info.append(player["accuracy"])
-        game_info.append(player["accuracyEnemySpotted"])
-        game_info.append(player["accuracyHead"])
-        game_info.append(player["shotsFiredEnemySpotted"])
-        game_info.append(player["shotsFired"])
-        game_info.append(player["shotsHitEnemySpotted"])
-        game_info.append(player["shotsHitFriend"])
-        game_info.append(player["shotsHitFriendHead"])
-        game_info.append(player["shotsHitFoe"])
-        game_info.append(player["shotsHitFoeHead"])
-        game_info.append(player["utilityOnDeathAvg"])
-        game_info.append(player["heFoesDamageAvg"])
-        game_info.append(player["heFriendsDamageAvg"])
-        game_info.append(player["heThrown"])
-        game_info.append(player["molotovThrown"])
-        game_info.append(player["smokeThrown"])
-        game_info.append(player["smokeThrownCT"])
-        game_info.append(player["smokeThrownCTGood"])
-        game_info.append(player["smokeThrownCTGoodRatio"])
-        game_info.append(player["smokeThrownCTFoes"])
-        game_info.append(player["counterStrafingShotsAll"])
-        game_info.append(player["counterStrafingShotsBad"])
-        game_info.append(player["counterStrafingShotsGood"])
-        game_info.append(player["counterStrafingShotsGoodRatio"])
-        game_info.append(player["flashbangHitFoe"])
-        game_info.append(player["flashbangLeadingToKill"])
-        game_info.append(player["flashbangHitFoeAvgDuration"])
-        game_info.append(player["flashbangHitFriend"])
-        game_info.append(player["flashbangThrown"])
-        game_info.append(player["flashAssist"])
-        game_info.append(player["score"])
-        game_info.append(player["initialTeamNumber"])
-        game_info.append(player["mvps"])
-        game_info.append(player["ctRoundsWon"])
-        game_info.append(player["ctRoundsLost"])
-        game_info.append(player["tRoundsWon"])
-        game_info.append(player["tRoundsLost"])
-        game_info.append(player["sprayAccuracy"])
-        game_info.append(player["totalKills"])
-        game_info.append(player["totalDeaths"])
-        game_info.append(player["kdRatio"])
-        game_info.append(player["multi2k"])
-        game_info.append(player["multi3k"])
-        game_info.append(player["multi4k"])
-        game_info.append(player["multi5k"])
-        game_info.append(player["hltvRating"])
-        game_info.append(player["hsp"])
-        game_info.append(player["roundsSurvived"])
-        game_info.append(player["roundsSurvivedPercentage"])
-        game_info.append(player["dpr"])
-        game_info.append(player["totalAssists"])
-        game_info.append(player["totalDamage"])
-        game_info.append(player["tradeKillOpportunities"])
-        game_info.append(player["tradeKillAttempts"])
-        game_info.append(player["tradeKillsSucceeded"])
-        game_info.append(player["tradeKillAttemptsPercentage"])
-        game_info.append(player["tradeKillsSuccessPercentage"])
-        game_info.append(player["tradeKillOpportunitiesPerRound"])
-        game_info.append(player["tradedDeathOpportunities"])
-        game_info.append(player["tradedDeathAttempts"])
-        game_info.append(player["tradedDeathAttemptsPercentage"])
-        game_info.append(player["tradedDeathsSucceeded"])
-        game_info.append(player["tradedDeathsSuccessPercentage"])
-        game_info.append(player["tradedDeathsOpportunitiesPerRound"])
-        game_info.append(player["leetifyRating"])
-        game_info.append(player["personalPerformanceRating"])
-        game_info.append(player["ctLeetifyRating"])
-        game_info.append(player["tLeetifyRating"])
-        
-        counter = 0
-        for i in opening_stats:
-            if i["attackerSteam64Id"] == steamId:
-                counter += 1
-        game_info.append(counter)
-        
-        info = tuple(game_info)
-        info = tuple(0 if value is None else value for value in info)
         if invalid == False:
             player_info.append(info)
      
