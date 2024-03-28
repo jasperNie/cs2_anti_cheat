@@ -83,7 +83,7 @@ def populate_table(directory, steamId):
             
         noMissingVariables = all(variable in player for variable in variables)
         
-        if noMissingVariables and player["tRoundsWon"] is not None and player["ctRoundsWon"] is not None and player["tRoundsLost"] is not None and player["ctRoundsLost"] is not None and invalid is not True:
+        if noMissingVariables and player["tRoundsWon"] is not None and player["ctRoundsWon"] is not None and player["tRoundsLost"] is not None and player["ctRoundsLost"] is not None and invalid is not True and stats["isCs2"] is True:
             roundsWon = player["tRoundsWon"] + player["ctRoundsWon"]
             roundsLost = player["tRoundsLost"] + player["ctRoundsLost"]
         
@@ -189,11 +189,12 @@ def populate_table(directory, steamId):
 def main(player_url):
     steamId = player_url.split("/")[-1]
 
-    player_profile_info = get_profile_json(steamId)
-    directory = create_directory(steamId)
+    # player_profile_info = get_profile_json(steamId)
+    # directory = create_directory(steamId)
+    directory = os.path.join(os.getcwd(), steamId)
     if directory:
-        for i in player_profile_info["games"]:
-            get_game_data(i["gameId"], directory)
+        # for i in player_profile_info["games"]:
+        #     get_game_data(i["gameId"], directory)
          
         data = populate_table(directory, steamId)
         
