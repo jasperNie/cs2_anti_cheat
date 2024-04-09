@@ -189,12 +189,16 @@ def populate_table(directory, steamId):
 def main(player_url):
     steamId = player_url.split("/")[-1]
 
-    # player_profile_info = get_profile_json(steamId)
-    # directory = create_directory(steamId)
-    directory = os.path.join(os.getcwd(), steamId)
+    player_profile_info = get_profile_json(steamId)
+    directory = create_directory(steamId)
+    # directory = os.path.join(os.getcwd(), steamId)
     if directory:
-        # for i in player_profile_info["games"]:
-        #     get_game_data(i["gameId"], directory)
+        counter = 0
+        for i in player_profile_info["games"]:
+            if counter == 100:
+                break
+            get_game_data(i["gameId"], directory)
+            counter += 1
          
         data = populate_table(directory, steamId)
         
