@@ -1,7 +1,9 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 import sqlite3
 import tensorflow as tf
 import requests
-import os
 import json
 import sys
 import shutil
@@ -304,15 +306,17 @@ def main(steamId):
         X = np.array([row[3:] for row in data])
         games = np.array([row[0] for row in data])
         loaded_model = tf.keras.models.load_model('cs2_anti_cheat_model.h5')
+        loaded_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])        
         predictions = loaded_model.predict(X)
         
         counter = 0
+        print("This player was likely cheating in the following games:\n------------------------------------------------")
         for i in range(len(predictions)):
-            if predictions[i] > 0.89:
-                print("This player was likely cheating in this game: https://leetify.com/app/match-details/{}/overview".format(games[i]))
+            if predictions[i] > 0.25:
+                print("https://leetify.com/app/match-details/{}/overview".format(games[i]))
                 counter += 1
         
-        print("Out of the {} game(s) found, this player was likely cheating in {} of them".format(len(games), counter))
+        print("\n------------------------------------------------\nOut of the {} game(s) found, this player was likely cheating in {} of them".format(len(games), counter))
                 
         shutil.rmtree(directory)
         
