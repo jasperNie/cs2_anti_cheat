@@ -21,9 +21,11 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(units=1, activation='sigmoid')
 ])
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mean_absolute_error'])  # Change loss to mean_squared_error
 
-history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=50, batch_size=32, validation_data=(X_test, y_test))
 
-test_loss, test_accuracy = model.evaluate(X_test, y_test)
-print('Test accuracy:', test_accuracy)
+test_loss, test_mae = model.evaluate(X_test, y_test)
+print('Test Mean Absolute Error:', test_mae)
+
+model.save('cs2_anti_cheat_model.h5')

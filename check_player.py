@@ -312,7 +312,7 @@ def main(steamId):
         counter = 0
         print("This player was likely cheating in the following games:\n------------------------------------------------")
         for i in range(len(predictions)):
-            if predictions[i] > 0.25:
+            if predictions[i] > 0.1:
                 print("https://leetify.com/app/match-details/{}/overview".format(games[i]))
                 counter += 1
         
